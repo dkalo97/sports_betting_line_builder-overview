@@ -6,7 +6,7 @@ A 7-stage data pipeline that aggregates expert betting predictions from multiple
 
 ## Why Private?
 
-The pipeline generates the actual outputs I use for daily betting research. The implementation details — the weighting scheme, defense adjustment ratios, Bayesian smoothing parameters, EV thresholds, and source selection logic — represent calibrated decisions refined over many iterations that have direct commercial value. The architecture and methodology are described here for technical evaluation purposes; the source code is not public.
+The pipeline generates the actual outputs I use for daily betting research. The source code is private because it's a working, actively maintained system — not a demo — and exposing the full production implementation would hand a direct competitor a calibrated, battle-tested starting point. The architecture and methodology are described here in full for technical evaluation purposes.
 
 ---
 
@@ -166,3 +166,7 @@ player_team_lookup/
   csv_parser.py             Multi-section candidates CSV parser
 outputs/                    All intermediate and final outputs (date-stamped)
 ```
+
+---
+
+I'm happy to do a live walkthrough or answer any questions about the implementation. Reach out via [LinkedIn](https://www.linkedin.com/in/danielkalo) or the contact on my resume.
