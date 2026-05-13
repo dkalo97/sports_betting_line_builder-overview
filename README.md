@@ -48,7 +48,7 @@ Fuzzy name matching resolves each player name and team abbreviation against ESPN
 
 #### Step 3 — ESPN Game Log Scraping (`gamelog_scraper_v5.9.6.py`)
 
-The largest and most complex component (~2,000 LOC). For each player and team in the candidate set, it fetches full-season game logs from ESPN using the resolved IDs, extracting 75+ metrics including:
+The largest and most complex component (~2,000 LOC). For each player and team in the candidate set, it fetches full-season game logs via ESPN's internal JSON API (`site.web.api.espn.com/apis/common/v3/sports/…`), extracting 75+ metrics including:
 
 - **Players**: raw box score stats (PTS, AST, REB, STL, BLK, 3PM, MIN, TOI) and derived per-36-minute normalizations
 - **Teams**: game-level margin, total score, win/loss, opponent context
@@ -57,7 +57,7 @@ Results are written to a two-sheet Excel file: `Player Gamelogs` and `Team Gamel
 
 #### Step 4 — Opponent Defense Scraping (`defense_ranks_scraper.py`)
 
-Scrapes season-to-date opponent defensive stats from Basketball-Reference (with equivalent sources for other sports). Produces a ranked ratio for each team × stat combination: how much more or less of a given stat their opponents produce relative to league average.
+Scrapes season-to-date opponent defensive stats from Basketball-Reference (with equivalent sources for other sports). Produces a ratio for each team × stat combination: how much more or less of a given stat their opponents produce relative to league average. For MLB, per-team opponent batting data is fetched from each team's B-Ref pitching page to compute exact TB, 2B, and 3B allowed ratios — more accurate than using H as a proxy.
 
 #### Step 5 — Line Builder: Weighted Projection + Edge Calculation (`line_builder.py`)
 
@@ -126,10 +126,11 @@ The final output is enriched with current market data from BettingPros: line mov
 ## Technology Stack
 
 - **Language**: Python 3, no frameworks
-- **Scraping**: Selenium (dynamic pages) + BeautifulSoup (HTML parsing)
+- **Scraping**: Selenium (dynamic pages) + BeautifulSoup (HTML parsing) + ESPN/BettingPros internal JSON APIs
 - **Data**: pandas, numpy, openpyxl
 - **Sources**: ESPN (game logs), Basketball-Reference (defense stats), OddsTrader, Pickswise, SportyTrader, TheSportsGeek, BettingPros
 - **Output format**: Date-stamped Excel files with named sheets
+- **Tooling**: ruff (linting), pytest (87 tests across 7 modules), Makefile (`make check` runs both)
 
 ---
 
@@ -161,9 +162,13 @@ scrapers/
   gamelog_scraper_v5.9.6.py ESPN game log scraper (2,000+ LOC)
   defense_ranks_scraper.py  Opponent defensive ratio scraper
   bettingpros_info_fetcher.py BettingPros market data enrichment
+tools/
+  log_paper_bets.py         Logs qualified bets to paper-trade ledger
+  mlb_result_checker.py     Resolves MLB paper bets via MLB Stats API
 player_team_lookup/
   espn_ids.py               Fuzzy name matching → ESPN player/team IDs
   csv_parser.py             Multi-section candidates CSV parser
+tests/                      87 pytest tests covering core calculation modules
 outputs/                    All intermediate and final outputs (date-stamped)
 ```
 
